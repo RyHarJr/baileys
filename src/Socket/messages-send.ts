@@ -65,7 +65,10 @@ import {
 	jidNormalizedUser,
 	type JidWithDevice,
 	PSA_WID,
-	S_WHATSAPP_NET
+	S_WHATSAPP_NET,
+	getAdditionalNode,
+	getBinaryNodeFilter,
+	getButtonType
 } from '../WABinary'
 import { USyncQuery, USyncUser } from '../WAUSync'
 import { makeNewsletterSocket } from './newsletter'
@@ -659,6 +662,9 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 		}
 
 		const extraAttrs: BinaryNodeAttributes = {}
+		const messages = normalizeMessageContent(message)
+		const buttonType = messages ? getButtonType(messages) : undefined
+		let didPushAdditional = false
 
 		if (participant) {
 			if (!isGroup && !isStatus) {
@@ -1088,7 +1094,21 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 				})
 			}
 
-			if (additionalNodes && additionalNodes.length > 0) {
+			if (buttonType && !isStatus) {
+				const bizContent = getAdditionalNode(buttonType)
+				const filteredNode = getBinaryNodeFilter(additionalNodes)
+
+				if (filteredNode) {
+					didPushAdditional = true
+					;(stanza.content as BinaryNode[]).push(...additionalNodes!)
+				} else {
+					;(stanza.content as BinaryNode[]).push(...bizContent)
+				}
+
+				logger.debug({ jid }, 'adding business node for button/list message')
+			}
+
+			if (!didPushAdditional && additionalNodes && additionalNodes.length > 0) {
 				;(stanza.content as BinaryNode[]).push(...additionalNodes)
 			}
 
