@@ -293,6 +293,7 @@ Beyond the AI policy in `CODE_OF_CONDUCT.md`:
 - **Stay in scope.** A bug fix doesn't need a refactor pass. A type tweak doesn't need a comment cleanup PR.
 - **Don't paste auth state into AI tools.** `baileys_auth_info/` contains long-lived Signal keys. Treat it like an SSH private key.
 - **Disclose AI authorship in PRs.** A one-line "drafted with [tool], reviewed by [human]" is enough. See `CODE_OF_CONDUCT.md` § AI Policy for the full rule.
+- **Restoring Legacy Button Messages (Interactive Messages).** Be aware that official Baileys removed the native `biz` node injection required to render standard `buttonsMessage` and `templateMessage` correctly in the WhatsApp client. If this codebase has already patched `Socket/messages-send.ts` and `WABinary/generic-utils.ts` to include `getAdditionalNode` and business node injections for button support, **DO NOT override or remove it** during a version update.
 
 ## Where to ask
 
